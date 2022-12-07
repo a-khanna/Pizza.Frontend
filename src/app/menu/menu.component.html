@@ -1,0 +1,4 @@
+<div class="row">
+    <app-pizza [pizza]="pizza" *ngFor="let pizza of pizzas | async" class="max-width-500"></app-pizza>
+    <app-side [side]="side" *ngFor="let side of sides | async" class="max-width-500"></app-side>
+</div>
