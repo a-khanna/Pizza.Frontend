@@ -9,7 +9,7 @@ import { CartService } from 'src/app/shared/services/cart.service';
 })
 export class SideComponent {
   @Input()
-  side: SideResponse | undefined;
+  side?: SideResponse;
 
   quantity: number = 1;
 

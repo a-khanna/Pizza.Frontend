@@ -8,8 +8,8 @@ import { PizzaResponse, PizzaService, SideResponse, SideService } from '../share
   styleUrls: ['./menu.component.css']
 })
 export class MenuComponent implements OnInit {
-  pizzas: Observable<Array<PizzaResponse>> | undefined;
-  sides: Observable<Array<SideResponse>> | undefined;
+  pizzas?: Observable<Array<PizzaResponse>>;
+  sides?: Observable<Array<SideResponse>>;
 
   constructor(private pizzaService: PizzaService, private sideService: SideService) { }
 

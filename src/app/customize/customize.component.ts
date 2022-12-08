@@ -14,16 +14,16 @@ export class CustomizeComponent implements OnInit, OnDestroy {
   isCustomization: boolean = false;
 
   size: Size = Size.Small;
-  sauceId: number | undefined;
+  sauceId?: number;
   extraCheese: boolean = false;
-  cheeseId: number | undefined;
+  cheeseId?: number;
   toppingIds: number[] = [];
   quantity: number = 1;
   price: number = 0;
 
-  allIngredientsObs: Observable<Array<IngredientResponse>> | undefined;
-  allIngredients: Array<IngredientResponse> | undefined;
-  subs: Subscription | undefined;
+  allIngredientsObs?: Observable<IngredientResponse[]>;
+  allIngredients?: IngredientResponse[];
+  subs?: Subscription;
 
   constructor(private ingredientService: IngredientService, private cartService: CartService, private customizeService: CustomizeService) {}
 
@@ -70,7 +70,7 @@ export class CustomizeComponent implements OnInit, OnDestroy {
     this.price *= this.quantity;
   }
 
-  onToppingClick(element: EventTarget | null, toppingId: number | undefined) {
+  onToppingClick(element: EventTarget | null, toppingId?: number) {
     if ((<HTMLInputElement>element).checked) {
       this.toppingIds.push(toppingId!);
     } else {

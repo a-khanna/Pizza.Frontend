@@ -12,7 +12,7 @@ import { CustomizeService } from 'src/app/shared/services/customize.service';
 })
 export class PizzaComponent {
   @Input()
-  pizza: PizzaResponse | undefined;
+  pizza?: PizzaResponse;
 
   quantity: number = 1;
 

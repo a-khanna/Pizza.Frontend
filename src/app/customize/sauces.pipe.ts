@@ -6,7 +6,7 @@ import { IngredientResponse, IngredientType } from '../shared/api-client';
 })
 export class SaucesPipe implements PipeTransform {
 
-  transform(value: IngredientResponse[] | undefined): IngredientResponse[] {
+  transform(value?: IngredientResponse[]): IngredientResponse[] {
     return value?.filter(v => v.ingredientType == IngredientType.Sauce) ?? [];
   }
 
