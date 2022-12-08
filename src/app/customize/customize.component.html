@@ -1,4 +1,4 @@
-<h2 *ngIf="pizza; else buildheading" class="text-center mb-5">Customize Pizza</h2>
+<h2 *ngIf="isCustomization; else buildheading" class="text-center mb-5">Customize Pizza</h2>
 <ng-template #buildheading><h2 class="text-center mb-5">Build your own Pizza!</h2></ng-template>
 
 <div class="container w-50">
@@ -30,7 +30,9 @@
     <p>Select Toppings</p>
     <div class="d-flex justify-content-between mb-3">
         <div class="form-check" *ngFor="let ingredient of allIngredients | toppings">
-            <input class="form-check-input" type="checkbox" value="" [id]="ingredient.name" (click)="onToppingClick($event.target, ingredient.id)">
+            <input class="form-check-input" type="checkbox" value="" [id]="ingredient.name"
+                (click)="onToppingClick($event.target, ingredient.id)"
+                [checked]="toppingIds.includes(ingredient.id!)">
             <label class="form-check-label" [for]="ingredient.name">
               {{ ingredient.name }}
             </label>

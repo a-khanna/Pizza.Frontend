@@ -1,7 +1,9 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
 import { IngredientResponse, IngredientService, IngredientType, PizzaResponse, Size } from '../shared/api-client';
+import { CartIgredient } from '../shared/models/cart-ingredient.model';
 import { CartService } from '../shared/services/cart.service';
+import { CustomizeService } from '../shared/services/customize.service';
 
 @Component({
   selector: 'app-customize',
@@ -9,8 +11,7 @@ import { CartService } from '../shared/services/cart.service';
   styleUrls: ['./customize.component.css']
 })
 export class CustomizeComponent implements OnInit, OnDestroy {
-  @Input()
-  pizza: PizzaResponse | undefined;
+  isCustomization: boolean = false;
 
   size: Size = Size.Small;
   sauceId: number | undefined;
@@ -24,13 +25,25 @@ export class CustomizeComponent implements OnInit, OnDestroy {
   allIngredients: Array<IngredientResponse> | undefined;
   subs: Subscription | undefined;
 
-  constructor(private ingredientService: IngredientService, private cartService: CartService) { }
+  constructor(private ingredientService: IngredientService, private cartService: CartService, private customizeService: CustomizeService) {}
 
   ngOnInit(): void {
     this.allIngredientsObs = this.ingredientService.ingredientsGet();
     this.subs = this.allIngredientsObs.subscribe(ings => {
       this.allIngredients = ings;
       this.cheeseId = ings.find(i => i.ingredientType == IngredientType.Cheese)?.id;
+      if (this.customizeService.pizza) {
+        let pizza = this.customizeService.pizza;
+        this.isCustomization = true;
+        this.size = pizza.size!;
+        this.quantity = pizza.quantity!;
+        this.extraCheese = pizza.ingredients?.map(i => i.id).includes(this.cheeseId) ?? false;
+        const sauceIds = ings.filter(i => i.ingredientType == IngredientType.Sauce).map(i => i.id);
+        this.sauceId = sauceIds.find(s => pizza.ingredients?.map(i => i.id).includes(s));
+        this.toppingIds = pizza.ingredients?.filter(i => i.id != this.cheeseId || i.id != this.sauceId).map(i => i.id!)!;
+
+        this.customizeService.clearPizza();
+      }
     });
   }
 
@@ -66,9 +79,21 @@ export class CustomizeComponent implements OnInit, OnDestroy {
   }
 
   onAddToCart() {
-    console.log(this.cheeseId);
-    let ingIds = [this.sauceId!, this.cheeseId!, ...this.toppingIds]
-    this.cartService.addPizza(this.size, this.quantity, ingIds);
+    let ings: CartIgredient[] = [];
+    if (this.cheeseId) {
+      ings.push({
+        id: this.cheeseId,
+        name: this.allIngredients?.find(i => i.id == this.cheeseId)?.name!
+      });
+    }
+
+    for (var toppingId of this.toppingIds) {
+      ings.push({
+        id: toppingId,
+        name: this.allIngredients?.find(i => i.id == toppingId)?.name!
+      });
+    }
+    this.cartService.addPizza('Custom Pizza', this.size, this.quantity, ings);
   }
 
   ngOnDestroy(): void {

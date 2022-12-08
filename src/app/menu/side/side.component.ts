@@ -16,6 +16,6 @@ export class SideComponent {
   constructor(private cartService: CartService) {}
 
   onAddToCart() {
-    this.cartService.addSide(this.side!.id!, this.quantity);
+    this.cartService.addSide(this.side!.id!, this.side!.name!, this.quantity);
   }
 }
