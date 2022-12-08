@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, ElementRef, Input, OnDestroy, OnInit } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
 import { IngredientResponse, IngredientService, IngredientType, PizzaResponse, Size } from '../shared/api-client';
 import { CartIgredient } from '../shared/models/cart-ingredient.model';
@@ -11,14 +11,15 @@ import { CustomizeService } from '../shared/services/customize.service';
   styleUrls: ['./customize.component.css']
 })
 export class CustomizeComponent implements OnInit, OnDestroy {
-  isCustomization: boolean = false;
+  isCustomization = false;
 
   size: Size = Size.Small;
   sauceId?: number;
   extraCheese: boolean = false;
   cheeseId?: number;
   toppingIds: number[] = [];
-  quantity: number = 1;
+  quantityInput = "1";
+  quantityValid = true;
   price: number = 0;
 
   allIngredientsObs?: Observable<IngredientResponse[]>;
@@ -36,7 +37,7 @@ export class CustomizeComponent implements OnInit, OnDestroy {
         let pizza = this.customizeService.pizza;
         this.isCustomization = true;
         this.size = pizza.size!;
-        this.quantity = pizza.quantity!;
+        this.quantityInput = pizza.quantity!.toString();
         this.extraCheese = pizza.ingredients?.map(i => i.id).includes(this.cheeseId) ?? false;
         const sauceIds = ings.filter(i => i.ingredientType == IngredientType.Sauce).map(i => i.id);
         this.sauceId = sauceIds.find(s => pizza.ingredients?.map(i => i.id).includes(s));
@@ -45,6 +46,13 @@ export class CustomizeComponent implements OnInit, OnDestroy {
         this.customizeService.clearPizza();
       }
     });
+  }
+
+  quantityNumber() {
+    let parse = parseInt(this.quantityInput);
+    if (isNaN(parse))
+      return 1;
+    return parse;
   }
 
   ngDoCheck() {
@@ -67,7 +75,7 @@ export class CustomizeComponent implements OnInit, OnDestroy {
     for(var toppingId of this.toppingIds)
       this.price += (this.allIngredients?.find(i => i.id == toppingId)?.price) ?? 0;
 
-    this.price *= this.quantity;
+    this.price *= this.quantityNumber();
   }
 
   onToppingClick(element: EventTarget | null, toppingId?: number) {
@@ -93,7 +101,18 @@ export class CustomizeComponent implements OnInit, OnDestroy {
         name: this.allIngredients?.find(i => i.id == toppingId)?.name!
       });
     }
-    this.cartService.addPizza('Custom Pizza', this.size, this.quantity, ings);
+    this.cartService.addPizza('Custom Pizza', this.size, this.quantityNumber(), ings);
+  }
+
+  onQuantityChange() {
+    if (isNaN(parseInt(this.quantityInput)))
+      this.quantityValid = false;
+    else
+      this.quantityValid = true;
+  }
+
+  cartDisableCheck() {
+    return !this.toppingIds.length || !this.quantityValid;
   }
 
   ngOnDestroy(): void {

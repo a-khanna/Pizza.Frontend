@@ -14,9 +14,17 @@ export class PizzaComponent {
   @Input()
   pizza?: PizzaResponse;
 
-  quantity: number = 1;
+  quantityInput = "1";
+  quantityValid = true;
 
   constructor(private router: Router, private cartService: CartService, private customizeService: CustomizeService) {}
+
+  quantityNumber() {
+    let parse = parseInt(this.quantityInput);
+    if (isNaN(parse))
+      return 1;
+    return parse;
+  }
 
   onAddToCart() {
     const ings: CartIgredient[] = [];
@@ -26,15 +34,22 @@ export class PizzaComponent {
         name: ing.name!
       });
     }
-    this.cartService.addPizza(this.pizza!.name!, Size.Small, this.quantity, ings);
+    this.cartService.addPizza(this.pizza!.name!, Size.Small, this.quantityNumber(), ings);
   }
 
   onCustomize() {
     this.customizeService.pizza = {
       size: Size.Small,
-      quantity: this.quantity,
+      quantity: this.quantityNumber(),
       ingredients: this.pizza?.ingredients?.map(i => { return {id: i.id!}})
     };
     this.router.navigate(['/build']);
+  }
+
+  onQuantityChange() {
+    if (isNaN(parseInt(this.quantityInput)))
+      this.quantityValid = false;
+    else
+      this.quantityValid = true;
   }
 }

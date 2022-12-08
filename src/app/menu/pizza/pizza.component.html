@@ -9,14 +9,20 @@
                 <p class="card-text">{{ pizza.description }}</p>
                 <p class="card-text opacity-75">{{ pizza.ingredients | ingredients }}</p>
                 <div class="d-flex justify-content-between mb-3">
-                    <p class="card-text green-text"><b>{{ pizza.price! * quantity | rupee }}</b></p>
-                    <input type="number" class="form-control w-50" placeholder="Quantity" min="1" max="10" [(ngModel)]="quantity">
+                    <p class="card-text green-text"><b>{{ pizza.price! * quantityNumber() | rupee }}</b></p>
+                    <div class="input-group has-validation w-50">
+                        <input type="number" class="form-control w-50" [ngClass]="quantityValid ? '' : 'is-invalid'" placeholder="Quantity" min="1" max="100"
+                            [(ngModel)]="quantityInput" (input)="onQuantityChange()">
+                        <div class="invalid-feedback" *ngIf="!quantityValid">
+                            Please enter a valid number.
+                        </div>  
+                    </div>  
                 </div>
                 <div class="text-center">
-                    <button type="button" class="btn btn-primary me-2" (click)="onAddToCart()">Add to Cart</button>
+                    <button type="button" class="btn btn-primary me-2" (click)="onAddToCart()" [disabled]="!quantityValid">Add to Cart</button>
                     <button type="button" class="btn btn-primary" (click)="onCustomize()">Customize</button>
                 </div>
-              </div>
+            </div>
         </div>
     </div>
 </div>
